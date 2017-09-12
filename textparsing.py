@@ -5,22 +5,34 @@
 
 import nltk
 #nltk.download()
-from nltk.book import text6
+#from nltk.book import text6
 
-#from nltk.org example code: divides the number of unique words by the total word count of the text
+#using already downloaded text (code modified from technaverbascripta.wordpress.com)
+f = open('PridePrejudice.txt', mode = 'r')
+text = f.read()
+nltk_text = text.split()
+final_text = nltk.Text(nltk_text)
+
+
+#divides the number of unique words by the total word count of the text (code modified from nltk.org) 
 def lexical_diversity(text):
     return len(set(text)) / len(text) 
 
+def percentage(count, total):
+    return 100 * count / total
 
-print("Examining " + str(text6))
-print("The text is " + str(len(text6)) + " characters long.") #the text is len(text6) chars long
-print("Lexical diversity = " + str(lexical_diversity(text6)))
+print("Examining " + str(final_text))
+print("The text is " + str(len(final_text)) + " characters long.")
+print("Lexical diversity = " + str(lexical_diversity(final_text)))
+print(str(percentage(final_text.count('the'), len(final_text))) + "% of the text is 'the'")
 
 
-words = {"swallow", "ni", "Arthur"}
+#finding the occurences of specific words in the text
+words = {"marry", "Elizabeth", "Darcy"}
 
 for word in words:
-	print("'" + word  + "'" + " occurs " + str(text6.count(word)) + " times.")
+	print("'" + word  + "'" + " occurs " + str(final_text.count(word)) + " times.")
+
 
 #concord = text6.concordance(word)
 #print(word + " occurs " str(len(str(concord))) "in the following passages of \n" + text6)
