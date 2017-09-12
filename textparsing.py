@@ -1,3 +1,8 @@
+#textparsing.py 
+#Elise Meike September 2017
+#experiments with nltk
+
+
 import nltk
 #nltk.download()
 from nltk.book import text6
