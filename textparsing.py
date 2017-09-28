@@ -6,18 +6,6 @@
 import nltk
 from urllib import request
 
-
-#divides the number of unique words by the total word count of the text (code modified from nltk.org) 
-def lexical_diversity(text):
-    return len(set(text)) / len(text) 
-
-def percentage(count, total):
-    return 100 * count / total
-
-def avg_sentence_length(text):
-	sentences = text.count('.') + text.count('!') + text.count('?')
-	return len(text) / sentences
-
 def get_text(url = None):
 	if url is None:
 		#using already downloaded text (code modified from technaverbascripta.wordpress.com)
@@ -34,17 +22,33 @@ def get_text(url = None):
 	#print(type(text))
 	return text
 
+def lexical_diversity(text):
+	#divides the number of unique words by the total word count of the text (code modified from nltk.org) 
+    return len(set(text)) / len(text) 
+
+def percentage(count, total):
+    return 100 * count / total
+
+def avg_sentence_length(text):
+	sentences = text.count('.') + text.count('!') + text.count('?')
+	return len(text) / sentences
+
+def occurrences(text, words):
+	#finding the occurences of specific words in the text
+	for word in words:
+		print("'{}' occurs {:,} times.".format(word, text.count(word)))
+
+def analyze(text, words):
+	print("Examining " + str(text))
+	print("The text is {:,} characters long.".format(len(text)))
+	print("Lexical diversity = {:03.3f}".format(lexical_diversity(text)))
+	print("{:03.3f} % of the text is 'the'".format(percentage(text.count('the'), len(text))))
+	print("The average length of a sentence is {:03.2f}".format(avg_sentence_length(text)))
+	occurrences(text, words)
+
+
+#let's do the thing
 final_text = get_text("http://www.gutenberg.org/files/1342/1342-0.txt")
-
-print("Examining " + str(final_text))
-print("The text is {:,} characters long.".format(len(final_text)))
-print("Lexical diversity = {:03.3f}".format(lexical_diversity(final_text)))
-print("{:03.3f} % of the text is 'the'".format(percentage(final_text.count('the'), len(final_text))))
-print("The average length of a sentence is {:03.2f}".format(avg_sentence_length(final_text)))
-
-
-#finding the occurences of specific words in the text
 words = {"marry", "Elizabeth", "Darcy"}
 
-for word in words:
-	print("'{}' occurs {:,} times.".format(word, final_text.count(word)))
+analyze(final_text, words)
