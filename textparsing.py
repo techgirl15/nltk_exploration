@@ -37,11 +37,11 @@ def avg_sentence_length(raw, text):
 	sentences = len(st(raw))
 	return len(text) / sentences
 
-def common_words(text, x):
+def common_words(text, depth):
 	fdist1 = nltk.FreqDist(text)
-	cwords = fdist1.most_common(x)
-	fdist1.plot(50, cumulative=True)
-	fdist1.plot(50, cumulative=False)
+	cwords = fdist1.most_common(depth)
+	#fdist1.plot(50, cumulative=True)
+	#fdist1.plot(50, cumulative=False)
 	return cwords
 
 def word_length(raw, text):
@@ -57,9 +57,10 @@ def word_length(raw, text):
 
 def occurrences(text, words):
 	#finding the occurences of specific words in the text
-	#lower_tokens = nltk.word_tokenize(raw.lower())
+	occurences = {}
 	for word in words:
-		print("'{}' occurs {:,} times.".format(word, text.count(word)))
+		occurences[word] = text.count(word)
+	return occurences
 
 def nouns(raw):
 	sentences = nltk.sent_tokenize(raw)
@@ -70,25 +71,49 @@ def nouns(raw):
 				nouns.append(word)
 	return nouns
 
-def analyze(raw, text, words, x):
-	print("Examining " + str(text))
-	print("The text is {:,} characters long.".format(len(text)))
-	print("Lexical diversity (unique words/total) = {:03.3f}".format(lexical_diversity(text)))
-	print("{:03.3f} % of the text is 'the'".format(percentage(text.count('the'), len(text))))
-	print("The mean length of a sentence is {:03.2f} words.".format(avg_sentence_length(raw, text)))
-	print("The most common word length is {} characters.".format(word_length(raw, text)[0]))
-	print("The mean word length is {:03.2f} characters.".format(word_length(raw, text)[1]))
-	print("The {} most common words and there number of times they occur are {}".format(x, common_words(text, x)))
+def analyze(raw, words, depth):
+	text = tokenize_text(raw.lower())
+	ret_val = {}
+	ret_val["text_name"] = str(text)
+	ret_val["lexical_diversity"] = lexical_diversity(text)
+	ret_val["len_char"] = len(text)
+	ret_val["mean_sent_len"] = avg_sentence_length(raw, text)
+	ret_val["mode_word_len"] = word_length(raw, text)[0]
+	ret_val["mean_word_len"] = word_length(raw, text)[1]
+	ret_val["common_words"] = common_words(text, depth)
+	ret_val["word_occurence"] = occurrences(text, words)
+	ret_val["noun_count"] = len(nouns(raw))
+
+	for word in words:
+		ret_val["percent_"+word] = percentage(text.count(word), len(text))
+	
+	return ret_val
+
+def print_analysis(analysis):
+	print("Examining " + analysis["text_name"])
+	print("The text is {:,} characters long.".format(int(analysis["len_char"])))
+	print("Lexical diversity (unique words/total) = {:03.3f}".format(analysis["lexical_diversity"]))
+	print("The mean length of a sentence is {:03.2f} words.".format(analysis["mean_sent_len"]))
+	print("The most common word length is {} characters.".format(analysis["mode_word_len"]))
+	print("The mean word length is {:03.2f} characters.".format(analysis["mean_word_len"]))
+	print("The most common words and the number of times they occur are {}".format(analysis["common_words"]))
 	#occurrences(text, words)
-	print("There are {:,} nouns in the text".format(len(nouns(raw))))
+	print("There are {:,} nouns in the text".format(analysis["noun_count"]))
+	percent_keys = []
+	for key in analysis.keys():
+		if key.startswith("percent_"):
+			percent_keys.append(key)
+	for key in percent_keys:
+		word = key[8:]
+		print("{:03.3f} % of the text is '{}'".format(analysis[key], word))
 
 
 
 
 #let's do the thing
 raw_words = get_text("http://www.gutenberg.org/files/1342/1342-0.txt")
-final_text = tokenize_text(raw_words.lower())
 words = {"the","a","be","to","of"}
-x = 10
+analysis_depth = 10
+analysis= analyze(raw_words, words, analysis_depth)
 
-analyze(raw_words, final_text, words, x)
+print_analysis(analysis)
