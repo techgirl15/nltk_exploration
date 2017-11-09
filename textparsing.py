@@ -83,10 +83,8 @@ def analyze(raw, words, depth):
 	ret_val["common_words"] = common_words(text, depth)
 	ret_val["word_occurence"] = occurrences(text, words)
 	ret_val["noun_count"] = len(nouns(raw))
-
 	for word in words:
 		ret_val["percent_"+word] = percentage(text.count(word), len(text))
-	
 	return ret_val
 
 def print_analysis(analysis):
@@ -111,9 +109,13 @@ def print_analysis(analysis):
 
 
 #let's do the thing
-raw_words = get_text("http://www.gutenberg.org/files/1342/1342-0.txt")
-words = {"the","a","be","to","of"}
+raw_words1 = get_text("http://www.gutenberg.org/files/1342/1342-0.txt")
+words1 = {"the","a","be","to","of"}
+raw_words2 = get_text("https://www.gutenberg.org/files/84/84.txt")
+words2 = {"the","a","be","to","of"}
 analysis_depth = 10
-analysis= analyze(raw_words, words, analysis_depth)
+analysis1 = analyze(raw_words1, words1, analysis_depth)
+analysis2 = analyze(raw_words2, words2, analysis_depth)
 
-print_analysis(analysis)
+print_analysis(analysis1)
+print_analysis(analysis2)
