@@ -5,6 +5,7 @@
 
 import nltk
 from urllib import request
+import pandas
 
 def get_text(url = None):
 	if url is None:
@@ -74,7 +75,7 @@ def nouns(raw):
 def analyze(raw, words, depth):
 	text = tokenize_text(raw.lower())
 	ret_val = {}
-	ret_val["text_name"] = str(text)
+#	ret_val["text_name"] = str(text)
 	ret_val["lexical_diversity"] = lexical_diversity(text)
 	ret_val["len_char"] = len(text)
 	ret_val["mean_sent_len"] = avg_sentence_length(raw, text)
@@ -87,35 +88,57 @@ def analyze(raw, words, depth):
 		ret_val["percent_"+word] = percentage(text.count(word), len(text))
 	return ret_val
 
-def print_analysis(analysis):
-	print("Examining " + analysis["text_name"])
-	print("The text is {:,} characters long.".format(int(analysis["len_char"])))
-	print("Lexical diversity (unique words/total) = {:03.3f}".format(analysis["lexical_diversity"]))
-	print("The mean length of a sentence is {:03.2f} words.".format(analysis["mean_sent_len"]))
-	print("The most common word length is {} characters.".format(analysis["mode_word_len"]))
-	print("The mean word length is {:03.2f} characters.".format(analysis["mean_word_len"]))
-	print("The most common words and the number of times they occur are {}".format(analysis["common_words"]))
+def meta_analysis(texts, words, analysis_depth):
+	analyses = {}
+	for text, url in texts.items():
+		raw_words = get_text(url)
+		analysis = analyze(raw_words, words, analysis_depth)
+		analyses[text] = analysis
+	return analyses
+
+
+def print_analysis(analyses):
+#	s = pandas.Series(analysis, name="test")
+#	print(s)
+	print("\t\t\t", end="")
+	for name in analyses.keys():
+		print(name + "\t\t", end="")
+	print("")
+	keys = list(analyses.values())[0].keys()
+	for key in keys:
+		print(key+"\t\t", end="")
+		for value in analyses.values():
+			print(str(value[key]) + "\t", end="")
+		print("")
+#	print("Examining " + analysis["text_name"])
+#	print("The text is {:,} characters long.".format(int(analysis["len_char"])))
+#	print("Lexical diversity (unique words/total) = {:03.3f}".format(analysis["lexical_diversity"]))
+#	print("The mean length of a sentence is {:03.2f} words.".format(analysis["mean_sent_len"]))
+#	print("The most common word length is {} characters.".format(analysis["mode_word_len"]))
+#	print("The mean word length is {:03.2f} characters.".format(analysis["mean_word_len"]))
+#	print("The most common words and the number of times they occur are {}".format(analysis["common_words"]))
 	#occurrences(text, words)
-	print("There are {:,} nouns in the text".format(analysis["noun_count"]))
-	percent_keys = []
-	for key in analysis.keys():
-		if key.startswith("percent_"):
-			percent_keys.append(key)
-	for key in percent_keys:
-		word = key[8:]
-		print("{:03.3f} % of the text is '{}'".format(analysis[key], word))
+#	print("There are {:,} nouns in the text".format(analysis["noun_count"]))
+#	percent_keys = []
+#	for key in analysis.keys():
+#		if key.startswith("percent_"):
+#			percent_keys.append(key)
+#	for key in percent_keys:
+#		word = key[8:]
+#		print("{:03.3f} % of the text is '{}'".format(analysis[key], word))
 
 
 
 
 #let's do the thing
-raw_words1 = get_text("http://www.gutenberg.org/files/1342/1342-0.txt")
-words1 = {"the","a","be","to","of"}
-raw_words2 = get_text("https://www.gutenberg.org/files/84/84.txt")
-words2 = {"the","a","be","to","of"}
+texts = {"Pride and Prejudice":"http://www.gutenberg.org/files/1342/1342-0.txt", "Frankenstein":"https://www.gutenberg.org/files/84/84.txt"}
+#raw_words1 = get_text("http://www.gutenberg.org/files/1342/1342-0.txt")
+words = {"the","a","be","to","of"}
+#raw_words2 = get_text("https://www.gutenberg.org/files/84/84.txt")
+#words2 = {"the","a","be","to","of"}
 analysis_depth = 10
-analysis1 = analyze(raw_words1, words1, analysis_depth)
-analysis2 = analyze(raw_words2, words2, analysis_depth)
+#analysis1 = analyze(raw_words1, words1, analysis_depth)
+#analysis2 = analyze(raw_words2, words2, analysis_depth)
 
-print_analysis(analysis1)
-print_analysis(analysis2)
+
+print_analysis(meta_analysis(texts, words, analysis_depth))
