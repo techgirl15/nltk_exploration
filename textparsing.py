@@ -5,7 +5,6 @@
 
 import nltk
 from urllib import request
-import pandas
 
 def get_text(url = None):
 	if url is None:
@@ -81,11 +80,11 @@ def analyze(raw, words, depth):
 	ret_val["mean_sent_len"] = avg_sentence_length(raw, text)
 	ret_val["mode_word_len"] = word_length(raw, text)[0]
 	ret_val["mean_word_len"] = word_length(raw, text)[1]
-	ret_val["common_words"] = common_words(text, depth)
-	ret_val["word_occurence"] = occurrences(text, words)
 	ret_val["noun_count"] = len(nouns(raw))
 	for word in words:
 		ret_val["percent_"+word] = percentage(text.count(word), len(text))
+	ret_val["common_words"] = common_words(text, depth)
+	ret_val["word_occurence"] = occurrences(text, words)
 	return ret_val
 
 def meta_analysis(texts, words, analysis_depth):
@@ -98,18 +97,22 @@ def meta_analysis(texts, words, analysis_depth):
 
 
 def print_analysis(analyses):
-#	s = pandas.Series(analysis, name="test")
-#	print(s)
-	print("\t\t\t", end="")
+	titles = [" "]
 	for name in analyses.keys():
-		print(name + "\t\t", end="")
-	print("")
+		titles.append(name)
+	f = " ".join(" {:%ds} " % 25 for n in titles)
+	print(f.format(*titles))
+#	print("\t\t\t", end="")
+#	for name in analyses.keys():
+#		print(name + "\t\t", end="")
+#	print("")
 	keys = list(analyses.values())[0].keys()
 	for key in keys:
-		print(key+"\t\t", end="")
+		values = [key]
 		for value in analyses.values():
-			print(str(value[key]) + "\t", end="")
-		print("")
+			values.append(str(value[key]))
+		print(f.format(*values))
+		
 #	print("Examining " + analysis["text_name"])
 #	print("The text is {:,} characters long.".format(int(analysis["len_char"])))
 #	print("Lexical diversity (unique words/total) = {:03.3f}".format(analysis["lexical_diversity"]))
@@ -131,7 +134,7 @@ def print_analysis(analyses):
 
 
 #let's do the thing
-texts = {"Pride and Prejudice":"http://www.gutenberg.org/files/1342/1342-0.txt", "Frankenstein":"https://www.gutenberg.org/files/84/84.txt"}
+texts = {"Pride and Prejudice":None, "Frankenstein":"https://www.gutenberg.org/files/84/84.txt"}
 #raw_words1 = get_text("http://www.gutenberg.org/files/1342/1342-0.txt")
 words = {"the","a","be","to","of"}
 #raw_words2 = get_text("https://www.gutenberg.org/files/84/84.txt")
