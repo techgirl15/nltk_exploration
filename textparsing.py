@@ -15,14 +15,13 @@ def get_text(url = None):
 		#getting and tokenizing text from a URL (code modified from nltk.org)
 		response = request.urlopen(url)
 		raw_text = response.read().decode('utf8')
-		#print(type(raw))
+
 	return raw_text
 
 def tokenize_text(text):
 	tokens = nltk.word_tokenize(text)
-	#print(type(tokens))
 	f_text = nltk.Text(tokens)
-	#print(type(text))
+
 	return f_text
 
 def lexical_diversity(text):
@@ -35,6 +34,7 @@ def percentage(count, total):
 def avg_sentence_length(raw, text):
 	st = nltk.sent_tokenize
 	sentences = len(st(raw))
+
 	return len(text) / sentences
 
 def common_words(text, depth):
@@ -42,6 +42,7 @@ def common_words(text, depth):
 	cwords = fdist1.most_common(depth)
 	#fdist1.plot(50, cumulative=True)
 	#fdist1.plot(50, cumulative=False)
+
 	return cwords
 
 def word_length(raw, text):
@@ -53,6 +54,7 @@ def word_length(raw, text):
 	modelength = fdist2.max()
 	avelength = num_chars/num_words
 	#fdist2.plot(20, cumulative=False)
+
 	return modelength, avelength
 
 def occurrences(text, words):
@@ -60,6 +62,7 @@ def occurrences(text, words):
 	occurences = {}
 	for word in words:
 		occurences[word] = text.count(word)
+
 	return occurences
 
 def nouns(raw):
@@ -67,14 +70,15 @@ def nouns(raw):
 	nouns = []
 	for sentence in sentences:
 		for word,pos in nltk.pos_tag(nltk.word_tokenize(str(sentence))):
-			if (pos == 'NN' or pos == 'NNP' or pos == 'NNS' or pos == 'NNPS'):
+			if pos in ['NN', 'NNP', 'NNS', 'NNPS']:
 				nouns.append(word)
+
 	return nouns
 
 def analyze(raw, words, depth):
 	text = tokenize_text(raw.lower())
+
 	ret_val = {}
-#	ret_val["text_name"] = str(text)
 	ret_val["lexical_diversity"] = lexical_diversity(text)
 	ret_val["len_char"] = len(text)
 	ret_val["mean_sent_len"] = avg_sentence_length(raw, text)
@@ -85,28 +89,34 @@ def analyze(raw, words, depth):
 		ret_val["percent_"+word] = percentage(text.count(word), len(text))
 	ret_val["common_words"] = common_words(text, depth)
 	ret_val["word_occurence"] = occurrences(text, words)
+
 	return ret_val
 
 def meta_analysis(texts, words, analysis_depth):
 	analyses = {}
+	#analyses is a dictonary of text names and sets of analysis (ie lexical diversity etc)
 	for text, url in texts.items():
 		raw_words = get_text(url)
 		analysis = analyze(raw_words, words, analysis_depth)
 		analyses[text] = analysis
+
 	return analyses
 
 
 def print_analysis(analyses):
 	titles = [" "]
-	for name in analyses.keys():
+	#iterates over the text names (keys of the analyses dictonary)
+	for name in analyses.keys(): 
 		titles.append(name)
+
+	#f is a formating placeholder, making columns of 25 characters that can be filled by any text <25 chars
+	#the number of columns f makes is based on the number of titles defined (and an extra for the row name)
 	f = " ".join(" {:%ds} " % 25 for n in titles)
 	print(f.format(*titles))
-#	print("\t\t\t", end="")
-#	for name in analyses.keys():
-#		print(name + "\t\t", end="")
-#	print("")
+
+	#keys is a list of operations done on the texts (ie lexical diversity etc) 
 	keys = list(analyses.values())[0].keys()
+	#this iterates over and prints the keys and data in the format f (defined above) so it is in columns of data
 	for key in keys:
 		values = [key]
 		for value in analyses.values():
@@ -135,13 +145,8 @@ def print_analysis(analyses):
 
 #let's do the thing
 texts = {"Pride and Prejudice":None, "Frankenstein":"https://www.gutenberg.org/files/84/84.txt"}
-#raw_words1 = get_text("http://www.gutenberg.org/files/1342/1342-0.txt")
 words = {"the","a","be","to","of"}
-#raw_words2 = get_text("https://www.gutenberg.org/files/84/84.txt")
-#words2 = {"the","a","be","to","of"}
 analysis_depth = 10
-#analysis1 = analyze(raw_words1, words1, analysis_depth)
-#analysis2 = analyze(raw_words2, words2, analysis_depth)
 
 
 print_analysis(meta_analysis(texts, words, analysis_depth))
