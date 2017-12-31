@@ -29,7 +29,7 @@ def lexical_diversity(text):
     return len(set(text)) / len(text) 
 
 def percentage(count, total):
-    return 100 * count / total
+	return 100 * count / total 
 
 def avg_sentence_length(raw, text):
 	st = nltk.sent_tokenize
@@ -40,15 +40,17 @@ def avg_sentence_length(raw, text):
 def common_words(text, depth):
 	fdist1 = nltk.FreqDist(text)
 	cwords = fdist1.most_common(depth)
-	#fdist1.plot(50, cumulative=True)
-	#fdist1.plot(50, cumulative=False)
+	#plots a line graph histogram of the most common words in each text. First it plots cumulatively.
+	#The cumulative plot shows a very clean function that matches the expected of Zipf's Law.
+	#The normal histogram shows a slightly less clean power law graph also indicative of Zipf's Law.
+	fdist1.plot(50, cumulative=True)
+	fdist1.plot(50, cumulative=False)
 
 	return cwords
 
 def word_length(raw, text):
 	fdist2 = nltk.FreqDist(len(w) for w in text)
 	#lwords = fdist2.most_common()
-	#print(lwords)
 	num_chars = len(raw)
 	num_words = len(text)
 	modelength = fdist2.max()
@@ -87,8 +89,9 @@ def analyze(raw, words, depth):
 	ret_val["noun_count"] = len(nouns(raw))
 	for word in words:
 		ret_val["percent_"+word] = percentage(text.count(word), len(text))
-	ret_val["common_words"] = common_words(text, depth)
-	ret_val["word_occurence"] = occurrences(text, words)
+	common_words(text, depth)
+	#ret_val["common_words"] = common_words(text, depth)
+	#ret_val["word_occurence"] = occurrences(text, words)
 
 	return ret_val
 
@@ -111,7 +114,7 @@ def print_analysis(analyses):
 
 	#f is a formating placeholder, making columns of 25 characters that can be filled by any text <25 chars
 	#the number of columns f makes is based on the number of titles defined (and an extra for the row name)
-	f = " ".join(" {:%ds} " % 25 for n in titles)
+	f = " ".join(" {:%ds} " % 30 for n in titles)
 	print(f.format(*titles))
 
 	#keys is a list of operations done on the texts (ie lexical diversity etc) 
@@ -120,25 +123,14 @@ def print_analysis(analyses):
 	for key in keys:
 		values = [key]
 		for value in analyses.values():
-			values.append(str(value[key]))
+			values.append(value[key])
+
+		#print(f.format(*values))
+		if key in ["len_char", "mode_word_len", "noun_count"]:
+			f = " {:25s} " + " ".join(" {:>20,d} " for n in range(0, len(titles) - 1))
+		else:
+			f = " {:25s} " + " ".join(" {:>20.2f} " for n in range(0,len(titles)-1))
 		print(f.format(*values))
-		
-#	print("Examining " + analysis["text_name"])
-#	print("The text is {:,} characters long.".format(int(analysis["len_char"])))
-#	print("Lexical diversity (unique words/total) = {:03.3f}".format(analysis["lexical_diversity"]))
-#	print("The mean length of a sentence is {:03.2f} words.".format(analysis["mean_sent_len"]))
-#	print("The most common word length is {} characters.".format(analysis["mode_word_len"]))
-#	print("The mean word length is {:03.2f} characters.".format(analysis["mean_word_len"]))
-#	print("The most common words and the number of times they occur are {}".format(analysis["common_words"]))
-	#occurrences(text, words)
-#	print("There are {:,} nouns in the text".format(analysis["noun_count"]))
-#	percent_keys = []
-#	for key in analysis.keys():
-#		if key.startswith("percent_"):
-#			percent_keys.append(key)
-#	for key in percent_keys:
-#		word = key[8:]
-#		print("{:03.3f} % of the text is '{}'".format(analysis[key], word))
 
 
 
